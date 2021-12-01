@@ -1,12 +1,11 @@
 # ！/usr/bin/env python
 # -*- coding:utf-8 -*-
-# author:Dongze Xie &Guochen Yu time: 2021/12/01
+# author:Dongze Xie & Guochen Yu time: 2021/11/30
 
 from tkinter import *
 import tkinter.messagebox
 from robot import Robot
-# from tools import *
-
+import random
 
 class GameGo:
 
@@ -41,7 +40,6 @@ class GameGo:
         self.draw_board()
         self.robot = Robot(self.board)
         self.can.grid(row=0, column=100)
-        # self.window.mainloop()
 
     @staticmethod
     def init_board():
@@ -111,7 +109,6 @@ class GameGo:
 
     def draw_chess_pieces(self, position, player=None):
         """draw ovals already on the board"""
-        # print(player)
         global r
         print(position)  # position stands for the coordinate of the board's two dimension array
         _x, _y = self.pos_in_game_board(position)
@@ -157,105 +154,65 @@ class GameGo:
 
     @staticmethod
     def get_pos_in_board(x, y):
-        """获得再二维数组棋盘中的位置"""
+        """Get the position in the two-dimensional array chessboard"""
         return (x + 25) // 30 - 1, (y + 25) // 30 - 1
 
     def man_play(self, event):
-        """人下棋"""
+
         if self.someone_win is True or self.is_start is False:
-            """如果有人赢了或者还没有开始，则不能下棋"""
+            """If someone wins or hasn't started yet, you can't play"""
             return
 
         ex = event.x
         ey = event.y
         # print(ex, ey)
         if not (10 < ex < 460 and 10 < ey < 460):
-            """如果鼠标点击在棋盘外，则不能下棋"""
+            """If the mouse clicks outside the chessboard, you cannot play chess"""
             return
 
         pos_in_board = self.get_pos_in_board(ex, ey)
         print(pos_in_board)
         print("mode:", self.mode)
         """
-            如果该点没有被下过，则就根据自己所执棋子的黑白落子，
-           对手的话就根据模式的值选择人人对弈或者人机对弈
+            If the point has not been played, then according to the black and white moves of the pieces you hold.
+            If the opponent chooses the game between everyone or the game based on the value of the model
         """
-        # if not self.not_done(pos_in_board):
-        #     if self.select_color == 1:
-        #         self.draw_chess_pieces(pos_in_board, 1)
-        #     elif self.select_color == 0:
-        #         self.draw_chess_pieces(pos_in_board, 0)
-        #
-        #     self.someone_win = self.check_someone_win()
-        #
-        #     if self.mode == 0:
-        #         self.ai_play()
-        #     elif self.mode == 1:
-        #         # self.man_play()
-        #         self.can.bind("<Button-1>", lambda x: self.man_play(x))
-        #
-        #     self.someone_win = self.check_someone_win()
+        
         if self.someone_win is False and self.is_start is True:
             if self.not_done(pos_in_board):
-                if self.mode == 0:  # 人人对弈
-                    # if self.select_color == 1:
-                    #     self.draw_chess_pieces(pos_in_board, 1)
-                    #     self.someone_win = self.check_someone_win()
-                    #     self.select_color = 0  # 之后会改参数
-                    # else:
-                    #     self.draw_chess_pieces(pos_in_board, 0)
-                    #     self.someone_win = self.check_someone_win()
-                    #     self.select_color = 1
+                if self.mode == 0:  # man to man
                     print("player_turn0:", self.player_turn)
                     self.draw_chess_pieces(pos_in_board, self.player_turn)
                     print("player_turn1:", self.player_turn)
                     self.someone_win = self.check_someone_win()
                     self.player_turn = 1 - self.player_turn
                     print("player_turn2:", self.player_turn)
-                else:  # 人机对弈
-                    if self.select_color == 1:  # 人执黑先手
+                else:  # man-machine game
+                    if self.select_color == 1:  # man take black first
                         if self.player_turn == 1:
                             self.draw_chess_pieces(pos_in_board, 1)
                             self.someone_win = self.check_someone_win()
+
                             self.ai_play()
                             self.someone_win = self.check_someone_win()
-                            # self.player_turn = 1
                     else:
                         if self.player_turn == 0:
-                            # self.ai_play()
-                            # self.someone_win = self.check_someone_win()
                             self.draw_chess_pieces(pos_in_board, 0)
                             self.someone_win = self.check_someone_win()
 
                             self.ai_play()
                             self.someone_win = self.check_someone_win()
-                            # self.player_turn = 1
-                        # else:
-                            # self.ai_play()
-                            # self.player_turn = 0
+
 
     def ai_play(self):
-        """AI下棋"""
-        # tkinter.messagebox.showinfo("ha ha ha", "hai mei you zuo chu lai")
+        """AI to play"""
         print("play_turn:", self.player_turn)
         if self.player_turn == 1:
-            # 人执黑
+            # man take black
             _x, _y, _z = self.robot.MaxValue_po(1, 0)
             position_in_matrix = _x, _y
-            # pos = self.pos_in_game_board(position_in_matrix)
             self.draw_chess_pieces(position_in_matrix, 0)
         else:
-            # if len(self.black_done) == 0 and len(self.white_done) == 0:
-            #     print("dian nao zhi hei xian shou")
-            #     # pos = self.pos_in_game_board((8, 8))
-            #     pos = 8, 8
-            #     self.draw_chess_pieces(pos, 1)  # 下在正中间 目前还不会主动执行
-            #     return
-            # else:
-            #     _x, _y, _ = self.robot.MaxValue_po(0, 1)
-            #     position_in_matrix = _x, _y
-            #     # pos = self.pos_in_game_board(position_in_matrix)
-            #     self.draw_chess_pieces(position_in_matrix, 1)
             _x, _y, _z = self.robot.MaxValue_po(0, 1)
             position_in_matrix = _x, _y
             print("position_in_matrix:", position_in_matrix)
@@ -263,7 +220,7 @@ class GameGo:
 
 
     def check_someone_win(self):
-        """检查是否有人赢了"""
+        """check if anyone has won"""
         if self.five_in_a_row(self.black_done):
             self.show_win_info("Black Win!!!")
             return True
@@ -274,13 +231,12 @@ class GameGo:
             return False
 
     def five_in_a_row(self, someone_done):
-        """存在物五子连珠"""
+        """five stones"""
         if len(someone_done) == 0:
             return False
         else:
             for row in range(15):
                 for col in range(15):
-                    # position = row, col
                     if ( not self.not_done1(row, col, someone_done) and
                          not self.not_done1(row + 1, col, someone_done) and
                          not self.not_done1(row + 2, col, someone_done) and
@@ -310,12 +266,12 @@ class GameGo:
         return False
 
     def show_win_info(self, winner):
-        """提示获胜信息"""
+        """Prompt for winning information"""
         print(winner)
         tkinter.messagebox.showinfo("Game Over", winner)
 
     def draw_chess_pieces_done(self, chess):
-        """在单步重置的时候画black_done和white_done中的点"""
+        """Draw the dots in black_done and white_done during single-step reset"""
         for p in chess:
             _x, _y = self.pos_in_game_board(p)
             oval = self.pos_to_draw(_x, _y)
@@ -324,124 +280,35 @@ class GameGo:
             else:
                 self.can.create_oval(oval, fill="black")
 
-    def undo(self):
-        """单步悔棋"""
-        if self.someone_win is True:
-            tkinter.messagebox.showinfo("Warning!", "Someone has won, Undo Is Disable")
-            return
-
-        if len(self.black_done) == 0 and len(self.white_done) == 0:
-            # self.is_start = True
-            return
-
-        if len(self.black_done) > len(self.white_done):
-            p = self.black_done.pop()
-            # self.black_done_done.append(p)
-            print(p)
-            print("white_done:", self.white_done, "\n", "black_done", self.black_done)
-            self.board[p[0]][p[1]] = -1
-            self.player_turn = 1 - self.player_turn
-            self.can.delete("all")
-            self.draw_board()
-            self.can.grid(row=0, column=0)
-            self.draw_chess_pieces_done(self.black_done)
-            self.draw_chess_pieces_done(self.white_done)
-        else:
-            p = self.white_done.pop()
-            # self.white_done_done.append(p)
-            print(p)
-            print("white_done:", self.white_done, "\n", "black_done", self.black_done)
-            self.board[p[0]][p[1]] = -1
-            self.player_turn = 1 - self.player_turn
-            self.can.delete("all")
-            self.draw_board()
-            self.can.grid(row=0, column=0)
-            self.draw_chess_pieces_done(self.white_done)
-            self.draw_chess_pieces_done(self.black_done)
-
-    def undo_all(self):
-        """重置棋盘"""
-        self.board = self.init_board()
-        print("undo_all:")
-        # for i in range(15):
-        #     for j in range(15):
-        #         print(self.board[i][j], end="  ")
-        #     print("\n")
-        self.someone_win = False
-        self.is_start = False
-        self.mode = 0
-        self.select_color = 1
-        self.player_turn = 1
-        self.white_done.clear()
-        self.black_done.clear()
-        self.can.delete("all")
-        self.draw_board()
-        self.robot = Robot(self.board)
-        self.can.grid(row=0, column=0)
-
-    #def redo(self):
-    #   """单步恢复撤销"""
-    #    tkinter.messagebox.showinfo("Alerting", "redo disabled")
-
-    #def redo_all(self):
-    #    """一次性恢复所有撤销"""
-    #    tkinter.messagebox.showinfo("Alerting", "redo_all disabled")
 
     def start_button(self):
-        """开始游戏"""
+        """Start Game"""
         if self.is_start is False:
             self.is_start = True
-            # if self.select_color == 1:  # 我执黑
-            #     if self.mode == 0:  # 人人对弈
-            #         pass
-            #     elif self.mode == 1:  # 人机对弈
-            #         pass
-            #     # self.draw_chess_pieces()
-            # elif self.select_color == 0:
-            #     if self.mode == 0:
-            #         pass
-            #     elif self.mode == 1:
-            #         pass
-            #     # self.draw_chess_pieces()
-            if self.mode == 0:  # 人人对弈
+            if self.mode == 0:  # man to man
                 print("ren ren dui yi")
-                # return
-            elif self.mode == 1:  # 人机对弈
+            elif self.mode == 1:  # man to machine
                 print("ren ji dui yi")
-                if self.select_color == 1:  # 人执黑先行
+                if self.select_color == 1:  # man take black first
                     return
-                    # self.ai_play()
 
-                elif self.select_color == 0:  # 机器执黑先行
+                elif self.select_color == 0:  # machine takes black first
                     self.player_turn = 0
-                    # self.man_play()
                     if len(self.black_done) == 0 and len(self.white_done) == 0:
                         print("dian nao zhi hei xian shou")
                         position_in_matrix = 7, 7
                         self.draw_chess_pieces(position_in_matrix, 1)
-                    # TODO 添加AI入口，暂时不能调用self.man_play
                     return
         else:
             return
 
     def start(self):
-        """生成各种功能按钮"""
-        b1 = Button(self.window, text="Start", command=self.start_button, width=10)  # width和height的值单位是字符
-        b1.place(relx=0, rely=0, x=495, y=100)
+        """Function button"""
+        b1 = Button(self.window, text="Start", command=self.start_button, width=10)  
+        b1.place(relx=0, rely=0, x=495, y=200)
 
-        b2 = Button(self.window, text="Undo", command=self.undo, width=10)
-        b2.place(relx=0, rely=0, x=495, y=150)
 
-        b3 = Button(self.window, text="Undo All", command=self.undo_all, width=10)
-        b3.place(relx=0, rely=0, x=495, y=200)
-
-        #b4 = Button(self.window, text="Redo", command=self.redo, width=10)
-        #b4.place(relx=0, rely=0, x=495, y=250)
-
-        #b5 = Button(self.window, text="Redo All", command=self.redo_all, width=10)
-        #b5.place(relx=0, rely=0, x=495, y=300)
-
-        """生成菜单栏，预留各种功能选项"""
+        """menu bar"""
         menu = Menu(self.window)
         submenu = Menu(menu, tearoff=0)
         submenu.add_command(label="New")
@@ -455,7 +322,7 @@ class GameGo:
         submenu.add_command(label="Computer plays white", command=self.select_mode3)
         menu.add_cascade(label="ModeSelect", menu=submenu)
         self.window.config(menu=menu)
-        # 检测鼠标左键的点击动作，并且返回在canvas中的坐标值
+        # Detect the click action of the left mouse button and return the coordinate value in the canvas
         self.can.bind("<Button-1>", lambda x: self.man_play(x))
         self.window.mainloop()
 
