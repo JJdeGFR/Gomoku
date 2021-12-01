@@ -23,21 +23,21 @@ class GameGo:
             black_done: save the positions done by the black side
             chess_piece_done：save occupied positions，index stands for odd:black, even:white
         """
-        self.mode = 0  # 默认模式人人对弈
+        self.mode = 0  # default pvp
         self.is_start = False
         self.someone_win = False
-        self.select_color = 1  # 玩家所执棋子颜色，默认执黑
-        self.player_turn = 1  # 玩家默认先手执黑
+        self.select_color = 1  # default color black player
+        self.player_turn = 1  # default black move first
         self.board = self.init_board()
         self.white_done = []
         self.black_done = []
         self.white_done_done = []
         self.black_done_done = []
         self.window = Tk()
-        self.window.title("CIS667 fianl project_GOMOKU_AI~")
+        self.window.title("CIS667 final project GOMOKU")
         self.window.geometry("600x470+100+100")
         self.window.resizable(0, 0)
-        self.can = Canvas(self.window, bg="green", width=470, height=470)
+        self.can = Canvas(self.window, bg="skyblue", width=470, height=470)
         self.draw_board()
         self.robot = Robot(self.board)
         self.can.grid(row=0, column=100)
@@ -45,12 +45,12 @@ class GameGo:
 
     @staticmethod
     def init_board():
-        """初始化抽象棋盘，二维数组"""
+        """initialize the abstract board ,two dimension array"""
         list1 = [[-1] * 15 for i in range(15)]
         return list1
 
     def draw_board(self):
-        """绘制棋盘"""
+        """draw the board"""
         for i in range(0,15):
             if i == 0 or i == 14:
                 self.can.create_line((25, 25 + i * 30), (445, 25 + i * 30), width=3)
@@ -65,19 +65,19 @@ class GameGo:
         self.can.create_oval(352, 352, 358, 358, fill="black")
 
     def select_mode(self, mode_flag):
-        """模式选择"""
+        """modeselection"""
         if self.is_start is False:
             if mode_flag == "pvp":
-                """人人对战"""
+                """human vs human"""
                 print("zhi xing le pvp")
                 self.mode = 0
             elif mode_flag == "cvp_b":
-                """电脑对战人，电脑执黑"""
+                """AI vs human ,AI use black"""
                 print("zhi xing le cvp_b")
                 self.mode = 1
                 self.select_color = 0
             elif mode_flag == "cvp_w":
-                """电脑对战人，电脑执白"""
+                """AI vs human ,AI use white"""
                 print("zhi xing le cvp_w")
                 self.mode = 1
                 self.select_color = 1
@@ -97,40 +97,52 @@ class GameGo:
         self.select_mode("cvp_w")
 
     def pos_in_game_board(self, position):
-        """找到UI棋盘中的位置"""
-        return position[0] * 30 + 25, position[1] * 30 + 25
+        """find position in the board UI"""
+        global r
+        r = random.randint(0, 9)
+        if r != 9:
+            return position[0] * 30 + 25, position[1] * 30 + 25
+        else:#10%chance teleport to its left position
+            return position[0] * 30 - 5, position[1] * 30 + 25
 
     def pos_to_draw(self, x, y):
-        """返回绘制椭圆的外切矩形的两点坐标"""
-        return x - 12, y - 12, x + 12, y + 12
+        """return two coordinate of the oval's circumscribed rectangle """
+        return x - 10, y - 10, x + 10, y + 10
 
     def draw_chess_pieces(self, position, player=None):
-        """绘制已经已经下在棋盘上的棋子"""
+        """draw ovals already on the board"""
         # print(player)
-        print(position)  # position是二位数组棋盘的坐标
+        global r
+        print(position)  # position stands for the coordinate of the board's two dimension array
         _x, _y = self.pos_in_game_board(position)
         oval = self.pos_to_draw(_x, _y)
         if player == 0:
-            self.can.create_oval(oval, fill="white")
-            self.white_done.append([position[0], position[1], 0])
-            self.board[position[0]][position[1]] = 0
+            if r == 9:
+                self.can.create_oval(oval, fill="white")
+                self.white_done.append([position[0] - 1, position[1], 0])
+                self.board[position[0]][position[1]] = 0
+            else:  # teleport to the left
+                self.can.create_oval(oval, fill="white")
+                self.white_done.append([position[0], position[1], 0])
+                self.board[position[0]][position[1]] = 0
         elif player == 1:
-            self.can.create_oval(oval, fill="black")
-            self.black_done.append([position[0], position[1], 1])
-            self.board[position[0]][position[1]] = 1
+            if r == 9: #teleport to the left
+                self.can.create_oval(oval, fill="black")
+                self.black_done.append([position[0] - 1, position[1], 1])
+                self.board[position[0]][position[1]] = 1
+            else:
+                self.can.create_oval(oval, fill="black")
+                self.black_done.append([position[0], position[1], 1])
+                self.board[position[0]][position[1]] = 1
         print("white_done: ", self.white_done)
         print("black_done: ", self.black_done)
-        # for i in range(15):
-        #     for j in range(15):
-        #         print(self.board[i][j], end="  ")
-        #     print("\n")
 
     def not_done(self, position):
-        """检测二位数组中相应的点是否被下过"""
+        """check if the point in two dimension array is already occupied"""
         return self.board[position[0]][position[1]] == -1
 
     def not_done1(self, x, y, chess):
-        """检测相应的(x, y)是否已经被下过了，并且是在chess，即black_done或者white_done中"""
+        """check if the corresponding (x,y)already occupied,AKA already in the white done or black done"""
         if len(chess) == 0:
             return True
         flag = 0

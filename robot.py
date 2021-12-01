@@ -1,11 +1,11 @@
 class Robot(object):
-    '''基于五子棋规则写的一个机器人'''
+    '''An AI base on the basic rule of gomoku game'''
 
     def __init__(self, _board):
         self.board = _board
 
     def haveValuePoints(self, player, enemy, board):
-        """算出棋盘中所有有价值的点"""
+        """calculate all points on the board which have value"""
         points = []
 
         for x in range(15):
@@ -18,7 +18,7 @@ class Robot(object):
                     for tmp in range(9):
                         i = x + tmp - 4
                         j = y + tmp - 4
-                        # 搜索的范围是x,y的周围8×8的空间
+                        # search range is the space around (x,y) of 8*8
                         if i < 0 or i > 14:
                             list1.append(-2)
                         else:
@@ -57,7 +57,7 @@ class Robot(object):
         return points
 
     def MaxValue_po(self, player, enemy):
-        """算出最大价值的点，先求取有价值点，再求其中的最大价值点。"""
+        """calculate the most valuable point，fetch all points have value，then check which is max"""
         points = self.haveValuePoints(player, enemy, self.board)
         flag = 0
         _point = []
@@ -65,10 +65,10 @@ class Robot(object):
             if p[2] > flag:
                 _point = p
                 flag = p[2]
-        return _point[0], _point[1], _point[2]  # 返回x，y，value
+        return _point[0], _point[1], _point[2]  # return x,y value
 
     def value_point(self, player, enemy, list1, list2, list3, list4):
-        """算出点的价值"""
+        """calculate value of points"""
         flag = 0
         flag += self.willbefive(player, list1)
         flag += self.willbefive(player, list2)
@@ -102,7 +102,7 @@ class Robot(object):
 
     @staticmethod
     def willbefive(player, checklist):
-        """下在这个点将会得到连五"""
+        """move this step get five in a row /?ooooo?"""
         if checklist[0] == player and checklist[1] == player and \
                 checklist[2] == player and checklist[3] == player:
             return 10000
@@ -123,7 +123,7 @@ class Robot(object):
 
     @staticmethod
     def willbealive4(player, checklist):
-        """下在这个点将会形成活四"""
+        """move this step get alive 4 /_oooo_"""
         if checklist[0] == -1 and checklist[1] == player and \
                 checklist[2] == player and checklist[3] == player \
                 and checklist[5] == -1:
@@ -145,7 +145,7 @@ class Robot(object):
 
     @staticmethod
     def willbesleep4(player, enemy, checklist):
-        """下在这个点会形成眠四"""
+        """move this step get sleep 4 /xoooo_"""
         if checklist[0] == enemy and checklist[1] == player and \
                 checklist[2] == player and checklist[3] == player \
                 and checklist[5] == -1:
@@ -183,7 +183,7 @@ class Robot(object):
 
     @staticmethod
     def willbealive3(player, checklist):
-        """下在这个点会形成活三"""
+        """move this step get alive 3 /_ooo_"""
         if checklist[0] == -1 and checklist[1] == -1 and \
                 checklist[2] == player and checklist[3] == player \
                 and checklist[5] == -1:
@@ -237,7 +237,7 @@ class Robot(object):
 
     @staticmethod
     def willbesleep3(player, enemy, checklist):
-        """下在这个点会形成眠三"""
+        """move this step get sleep 3 /xooo_"""
         if checklist[1] == enemy and checklist[2] == player and \
                 checklist[3] == player and checklist[5] == -1 \
                 and checklist[6] == -1:
@@ -379,7 +379,7 @@ class Robot(object):
 
     @staticmethod
     def willbealive2(player, enemy, checklist):
-        """下在这个点会形成活二"""
+        """move this step get alive 2 /_oo_"""
         if checklist[1] == -1 and checklist[2] == -1 and \
                 checklist[3] == player and checklist[5] == -1 \
                 and checklist[6] == -1:
@@ -409,7 +409,7 @@ class Robot(object):
 
     @staticmethod
     def willbesleep2(player, enemy, checklist):
-        """下在这个点会形成眠二"""
+        """move this step get sleep 2 /_oox"""
         if checklist[2] == enemy and checklist[3] == player and \
                 checklist[5] == -1 and checklist[6] == -1 \
                 and checklist[7] == -1:
