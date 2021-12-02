@@ -13,8 +13,4 @@ Main program and using:
 AI programming:
 Robot.py is our AI programming, which contains some control behaviors and rules for AI.  
 
- 
-ADP programming:
-The ADP programming stores some algorithms that we used for AI
-
  
